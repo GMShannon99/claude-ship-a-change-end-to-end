@@ -33,3 +33,14 @@ Checked the three grading tests in `tests/update-user.test.js` line by line agai
 handler: update-and-200, unknown-id-404, and missing-field-400. Confirmed the existing
 `tests/users.test.js` and `tests/notes.test.js` still pass, and that `npm run lint` stays
 clean (no new eslint-disable comments needed, no unused vars).
+
+Ran a broader self-review (correctness, reuse, and cross-file angles) before opening the
+PR. It confirmed the not-found and malformed-JSON paths already behave the same as the
+existing `GET /users/:id` and `POST /users` routes (nothing new introduced there), and
+flagged two things worth naming rather than fixing: (1) validation is truthy-only, so a
+value like `name: 0` would pass and get persisted — an existing gap in `POST /users` that
+this change now also applies to overwriting existing records; and (2) the id-parsing,
+validation, and 404-response blocks are each a few lines duplicated from `GET /:id` /
+`POST /`. Left both as-is: they match this repo's existing (helper-free) conventions, and
+extracting shared validation for two fields across a 53-line file would be inconsistent
+with the rest of the codebase.
